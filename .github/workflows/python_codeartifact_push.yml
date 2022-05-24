@@ -1,0 +1,55 @@
+name: Build and publish Python 🐍 distributions 📦 to CodeArtifact
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: CodeArtifact repository name
+        type: string
+        required: true
+      domain:
+        description: CodeArtifact domain name
+        type: string
+        required: true
+      domain_owner:
+        description: AWS account ID where your repo's domain lives
+        type: number
+        required: true
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  build-n-publish:
+    name: Build and publish Python 🐍 distributions 📦 to CodeArtifact
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+
+    - name: setup awscli
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+
+    - name: Connect pip and twine to CodeArtifact
+      run: |
+        aws codeartifact login --tool pip --repository ${{ inputs.repository }} --domain ${{ inputs.domain }} --domain-owner ${{ inputs.domain_owner }}
+        aws codeartifact login --tool twine --repository ${{ inputs.repository }} --domain ${{ inputs.domain }} --domain-owner ${{ inputs.domain_owner }}
+
+    - name: Install pypa/build + twine
+      run: python -m pip install build twine
+
+    - name: Build a binary wheel and a source tarball
+      run: python -m build --sdist --wheel --outdir dist/ .
+
+    - name: Publish distribution 📦 to CodeArtifact
+      run: twine upload -r codeartifact dist/*
