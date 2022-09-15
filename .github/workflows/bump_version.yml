@@ -68,7 +68,7 @@ jobs:
 
       - name: Bump version
         run: |
-          bump2version auto --parts auto
+          bump2version auto
       - name: Push changes
         uses: sleepypikachu/github-push-action@bb3766ad6abf5b7209c3284683821505139e5065
         with:
