@@ -75,3 +75,4 @@ jobs:
           github_token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
+
