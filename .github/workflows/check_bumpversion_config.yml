@@ -13,4 +13,4 @@ jobs:
         with:
           python-version: "3.8"
 
-      - uses: landtechnologies/actions-check-bumpversion-cfg@v1.0.0
+      - uses: landtechnologies/actions-check-bumpversion-cfg@v2.0.0
