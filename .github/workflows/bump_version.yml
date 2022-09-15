@@ -1,0 +1,77 @@
+name: Bump version
+
+on:
+  workflow_call:
+    inputs:
+      git_name:
+        description: The commit author name
+        required: true
+        type: string
+      git_email:
+        description: The email address to commit with
+        required: true
+        type: string
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  check_present:
+    runs-on: ubuntu-latest
+    outputs:
+      bump: ${{ steps.check.outputs.bump }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Check Present
+        id: check
+        run: |
+          set +e
+          grep "new_version" .bumpversion.cfg
+          x=$?
+          echo $x
+          if [ $x -eq 0 ]; then echo "::set-output name=bump::present"; else echo "::set-output name=bump::missing"; fi
+      - name: Print output
+        run: |
+          echo ${{ steps.check.outputs.bump }}
+
+  bump_version:
+    runs-on: ubuntu-latest
+    needs: check_present
+    if: needs.check_present.outputs.bump == 'present'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install bump2version
+        run: |
+          pip install --no-cache-dir bump2version
+      - name: Configure git user
+        run: |
+          git config --global user.name ${{ inputs.git_name }}
+          git config --global user.email ${{ inputs.git_email }}
+          git config --global pull.rebase false
+
+      - name: Check auto correctly configured
+        run: |
+          grep --fixed-strings '[bumpversion:part:auto]' .bumpversion.cfg
+
+      - name: Bump version
+        run: |
+          bump2version auto --parts auto
+      - name: Push changes
+        uses: sleepypikachu/github-push-action@bb3766ad6abf5b7209c3284683821505139e5065
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
