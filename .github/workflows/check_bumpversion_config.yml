@@ -9,13 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: "3.8"
 
-      - run: ls
-
-      - name: Must supply valid new_version and current_version
-        run:
-          python scripts/check_bumpversion_cfg.py
+      - uses: landtechnologies/actions-check-bumpversion-cfg@v1.0.0
