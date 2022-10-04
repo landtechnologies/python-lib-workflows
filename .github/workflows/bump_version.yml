@@ -70,7 +70,7 @@ jobs:
         run: |
           bump2version auto
       - name: Push changes
-        uses: sleepypikachu/github-push-action@bb3766ad6abf5b7209c3284683821505139e5065
+        uses: ad-m/github-push-action@35284cf030a5836cb567a7bf1b39ebafbfae5f4a
         with:
           github_token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           branch: ${{ github.ref }}
