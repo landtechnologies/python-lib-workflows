@@ -31,7 +31,7 @@ jobs:
         id: check
         run: |
           set +e
-          grep "new_version" .bumpversion.cfg
+          grep "new_version[[:space:]]*=" .bumpversion.cfg
           x=$?
           echo $x
           if [ $x -eq 0 ]; then echo "bump=present" >> $GITHUB_OUTPUT; else echo "bump=missing" >> $GITHUB_OUTPUT; fi
