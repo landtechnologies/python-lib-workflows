@@ -45,7 +45,7 @@ jobs:
     if: needs.check_present.outputs.bump == 'present'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           fetch-depth: 0
